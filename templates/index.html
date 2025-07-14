@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent Manager</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=20250712">
+    <style>
+        /* Force button alignment inline to override cache - CRITICAL FIX */
+        div.form-buttons {
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            gap: 8px !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            margin-top: 20px !important;
+            margin-bottom: 20px !important;
+            width: 100% !important;
+        }
+        div.form-buttons button,
+        div.form-buttons .list-btn,
+        div.form-buttons .clear-btn,
+        div.form-buttons .back-btn,
+        div.form-buttons .delete-btn {
+            flex-shrink: 0 !important;
+            padding: 10px 16px !important;
+            font-size: 13px !important;
+            white-space: nowrap !important;
+            display: inline-block !important;
+            margin: 0 !important;
+        }
+        
+        /* Debug border removed - layout is working correctly */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Agent Manager</h1>
+        
+        <div class="menu-container">
+            <div class="menu-item" onclick="showSection('configure')">
+                <h2>1. Configure Agent</h2>
+                <p>Select the type of agent to deploy</p>
+            </div>
+            
+            <div class="menu-item" onclick="showSection('deploy')">
+                <h2>2. Deploy Agent</h2>
+                <p>Deploy your agent to Vertex AI Agent Engine</p>
+            </div>
+            
+            <div class="menu-item" onclick="showSection('test')">
+                <h2>3. Test Agent</h2>
+                <p>Test your deployed agent with queries</p>
+            </div>
+            
+            <div class="menu-item" onclick="showSection('register')">
+                <h2>4. Register to Agentspace</h2>
+                <p>Register your agent to Agentspace</p>
+            </div>
+            
+            <div class="menu-item" onclick="showSection('delete')">
+                <h2>5. Delete from Agentspace</h2>
+                <p>Remove an agent from Agentspace</p>
+            </div>
+            
+            <div class="menu-item quit" onclick="quitApp()">
+                <h2>6. Quit</h2>
+                <p>Exit the application</p>
+            </div>
+        </div>
+        
+        <!-- Configure Agent Section -->
+        <div id="configure" class="section">
+            <h2>Configure Agent</h2>
+            
+            <div id="agentSelection">
+                <h3>Available Agent Types:</h3>
+                <div id="agentTypesList">
+                    <div class="loading-state">
+                        <div class="loading-spinner"></div>
+                        <p>Click "Refresh Agent Types" to load available agents...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="agentConfigDetails" style="display: none;">
+                <h3>Agent Configuration</h3>
+                <div id="configDetails"></div>
+                <div id="envVarStatus"></div>
+            </div>
+            
+            <div id="configureResult" class="result"></div>
+            
+            <div class="form-buttons">
+                <button type="button" onclick="loadAgentTypes()" class="list-btn">
+                    <span class="button-text">Refresh Agent Types</span>
+                    <span class="button-loading" style="display: none;">
+                        <div class="button-spinner"></div>
+                        Loading...
+                    </span>
+                </button>
+                <button type="button" onclick="clearConfigureResult()" class="clear-btn">Clear Result</button>
+                <button class="back-btn" onclick="showMenu()">Back to Menu</button>
+            </div>
+        </div>
+        
+        <!-- Deploy Section -->
+        <div id="deploy" class="section">
+            <h2>Deploy Agent</h2>
+            
+            
+            <div class="config-header">
+                <h3>Current Configuration</h3>
+                <button type="button" id="editConfigBtn" class="edit-btn">Edit Configuration</button>
+            </div>
+            
+            <div id="configSection" class="config-display">
+                <div class="config-item">
+                    <label>Project ID:</label>
+                    <span id="displayProjectId" class="config-value">Loading...</span>
+                </div>
+                <div class="config-item">
+                    <label>Location:</label>
+                    <span id="displayLocation" class="config-value">Loading...</span>
+                </div>
+                <div class="config-item">
+                    <label>Model:</label>
+                    <span id="displayModel" class="config-value">Loading...</span>
+                </div>
+                <div class="config-item">
+                    <label>Storage Bucket:</label>
+                    <span id="displayStorageBucket" class="config-value">Loading...</span>
+                </div>
+                <div class="config-item">
+                    <label>Agentspace ID:</label>
+                    <span id="displayAgentspaceId" class="config-value">Loading...</span>
+                </div>
+            </div>
+            
+            <div id="editConfigSection" style="display: none;">
+                <h4>Edit Configuration</h4>
+                <div class="edit-form">
+                    <label for="editProjectId">Project ID:</label>
+                    <input type="text" id="editProjectId" placeholder="Leave blank to use default from .env">
+                    
+                    <label for="editLocation">Location:</label>
+                    <select id="editLocation">
+                        <option value="">Use default from .env</option>
+                        <option value="us-central1">us-central1</option>
+                        <option value="us-east1">us-east1</option>
+                        <option value="us-west1">us-west1</option>
+                        <option value="europe-west1">europe-west1</option>
+                        <option value="europe-west2">europe-west2</option>
+                        <option value="europe-west4">europe-west4</option>
+                        <option value="asia-northeast1">asia-northeast1</option>
+                        <option value="asia-southeast1">asia-southeast1</option>
+                    </select>
+                    
+                    <label for="editModelName">Model Name:</label>
+                    <select id="editModelName">
+                        <option value="">Use default from .env</option>
+                        <option value="gemini-2.5-flash">gemini-2.5-flash</option>
+                        <option value="gemini-2.5-pro">gemini-2.5-pro</option>
+                    </select>
+                    
+                    <label for="editStorageBucket">Storage Bucket:</label>
+                    <input type="text" id="editStorageBucket" placeholder="gs://your-bucket-name or leave blank for default">
+                    
+                    <label for="editAgentspaceId">Agentspace ID:</label>
+                    <input type="text" id="editAgentspaceId" placeholder="e.g., innovation-basement_1741551269956">
+                    
+                    <div class="button-group">
+                        <button type="button" id="saveConfigBtn" class="save-btn">Save</button>
+                        <button type="button" id="cancelConfigBtn" class="cancel-btn">Cancel</button>
+                    </div>
+                </div>
+            </div>
+            
+            <form id="deployForm">
+                <h3>Deployment Settings</h3>
+                
+                <label for="agentName">Agent Name:</label>
+                <input type="text" id="agentName" name="agentName" placeholder="my-agent" required>
+                
+                <input type="hidden" id="projectId" name="projectId">
+                <input type="hidden" id="location" name="location">
+                <input type="hidden" id="modelName" name="modelName">
+                <input type="hidden" id="storageBucket" name="storageBucket">
+            </form>
+            <div id="deployResult" class="result"></div>
+            
+            <div class="form-buttons">
+                <button type="button" onclick="document.getElementById('deployForm').requestSubmit()">Deploy Agent</button>
+                <button type="button" class="clear-btn" onclick="clearDeployForm()">Clear</button>
+                <button class="back-btn" onclick="showMenu()">Back to Menu</button>
+            </div>
+        </div>
+        
+        <!-- Test Section -->
+        <div id="test" class="section">
+            <h2>Test Agent</h2>
+            
+            <form id="testForm">
+                <label for="testAgentSelect">Select Deployed Agent:</label>
+                <select id="testAgentSelect" onchange="selectTestAgent(this.value)">
+                    <option value="">Click "Load Agents" to populate this dropdown</option>
+                </select>
+                
+                <label for="resourceName">Agent Resource Name:</label>
+                <input type="text" id="resourceName" name="resourceName" placeholder="Enter agent resource name or select from dropdown" required>
+                
+                <label for="query">Query:</label>
+                <textarea id="query" name="query" rows="4" placeholder="Show me all customers" required></textarea>
+            </form>
+            <div id="testResult" class="result"></div>
+            
+            <div class="form-buttons">
+                <button onclick="loadTestAgents()" class="list-btn">
+                    <span class="button-text">Load Agents</span>
+                    <span class="button-loading" style="display: none;">
+                        <div class="button-spinner"></div>
+                        Loading...
+                    </span>
+                </button>
+                <button type="button" onclick="document.getElementById('testForm').requestSubmit()">Test Query</button>
+                <button type="button" class="clear-btn" onclick="clearTestForm()">Clear</button>
+                <button class="back-btn" onclick="showMenu()">Back to Menu</button>
+            </div>
+        </div>
+        
+        <!-- Register Section -->
+        <div id="register" class="section">
+            <h2>Register to Agentspace</h2>
+            
+            <div class="agentspace-info">
+                <label>Current Agentspace ID:</label>
+                <span id="registerAgentspaceId" class="config-value">Loading...</span>
+            </div>
+            
+            <form id="registerForm">
+                <label for="registerAgentSelect">Select Deployed Agent:</label>
+                <select id="registerAgentSelect" onchange="selectRegisterAgent(this.value)">
+                    <option value="">Click "Load Agents" to populate this dropdown</option>
+                </select>
+                
+                <label for="registerResourceName">Agent Resource Name:</label>
+                <input type="text" id="registerResourceName" name="resourceName" placeholder="Enter agent resource name or select from dropdown" required>
+                
+                <label for="displayName">Display Name:</label>
+                <input type="text" id="displayName" name="displayName" placeholder="Query Agent" required>
+                
+                <label for="description">Description:</label>
+                <textarea id="description" name="description" rows="3" placeholder="An agent for querying databases" required></textarea>
+            </form>
+            <div id="registerResult" class="result"></div>
+            
+            <div class="form-buttons">
+                <button onclick="loadRegisterAgents()" class="list-btn">
+                    <span class="button-text">Load Agents</span>
+                    <span class="button-loading" style="display: none;">
+                        <div class="button-spinner"></div>
+                        Loading...
+                    </span>
+                </button>
+                <button type="button" onclick="document.getElementById('registerForm').requestSubmit()">Register Agent</button>
+                <button type="button" class="clear-btn" onclick="clearRegisterForm()">Clear</button>
+                <button class="back-btn" onclick="showMenu()">Back to Menu</button>
+            </div>
+        </div>
+        
+        <!-- Delete Section -->
+        <div id="delete" class="section">
+            <h2>Delete from Agentspace</h2>
+            
+            <form id="deleteForm">
+                <label for="deleteAgentSelect">Select Agent to Delete:</label>
+                <select id="deleteAgentSelect" onchange="selectDeleteAgent(this.value)">
+                    <option value="">Click "Load Agents" to populate this dropdown</option>
+                </select>
+                
+                <label for="agentId">Agent ID:</label>
+                <input type="text" id="agentId" name="agentId" placeholder="Enter agent ID to delete or select from dropdown" required>
+            </form>
+            <div id="deleteResult" class="result"></div>
+            
+            <div class="form-buttons">
+                <button onclick="loadDeleteAgents()" class="list-btn">
+                    <span class="button-text">Load Agents</span>
+                    <span class="button-loading" style="display: none;">
+                        <div class="button-spinner"></div>
+                        Loading...
+                    </span>
+                </button>
+                <button type="button" onclick="document.getElementById('deleteForm').requestSubmit()" class="delete-btn">Delete Agent</button>
+                <button type="button" class="clear-btn" onclick="clearDeleteForm()">Clear</button>
+                <button class="back-btn" onclick="showMenu()">Back to Menu</button>
+            </div>
+        </div>
+        
+        <!-- Loading indicator -->
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Processing...</p>
+        </div>
+    </div>
+    
+    <script src="{{ url_for('static', filename='js/script.js') }}?v=20250712"></script>
+</body>
+</html>
