@@ -35,11 +35,17 @@ source .venv/bin/activate
 
 # Install dependencies
 echo "✓ Installing dependencies..."
-uv pip install -r <(grep -v '^\s*#' pyproject.toml | grep -A 100 'dependencies = \[' | grep -B 100 '\]' | grep '"' | sed 's/[",]//g' | sed 's/^[[:space:]]*//')
+# Use the requirements.txt file instead of parsing pyproject.toml
+if [ -f requirements.txt ]; then
+    uv pip install -r requirements.txt
+else
+    echo "❌ Error: requirements.txt not found"
+    exit 1
+fi
 
-# Install neo4j driver specifically
-echo "✓ Ensuring Neo4j driver is installed..."
-uv pip install neo4j
+# Install additional critical dependencies
+echo "✓ Installing additional dependencies..."
+uv pip install google-adk python-dotenv
 
 # Create .env from example if it doesn't exist
 if [ ! -f .env ]; then

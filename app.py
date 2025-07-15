@@ -21,18 +21,18 @@ app = Flask(__name__)
 # Agent configurations - Add new agents here
 AGENT_CONFIGS = {
     "neo4j": {
-        "module": "agents.agent",
+        "module": "neo4j_database_agent.agent",
         "attribute": "root_agent",
-        "display_name": "Neo4j Query Agent",
+        "display_name": "Neo4j Database Agent",
         "description": "Query Neo4j databases using natural language",
-        "requirements": ["neo4j>=5.0.0"],
+        "requirements": ["neo4j>=5.0.0", "python-dotenv>=1.0.0"],
         "env_vars": {
             "NEO4J_URI": {"required": True, "description": "Neo4j database URI"},
             "NEO4J_USERNAME": {"required": True, "description": "Neo4j username"},
             "NEO4J_PASSWORD": {"required": True, "description": "Neo4j password"},
             "NEO4J_DATABASE": {"required": False, "default": "neo4j", "description": "Neo4j database name"}
         },
-        "extra_packages": ["agents/agent.py"],
+        "extra_packages": ["neo4j_database_agent/"],
         "test_message": "Test connection to database",
         "tool_description": "Query Neo4j database using natural language. This tool can retrieve nodes, relationships, and execute complex graph queries."
     }
@@ -827,4 +827,4 @@ def list_agents():
         }), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=5001)

@@ -1,4 +1,4 @@
-# Agentspace Neo4j Agent
+# Neo4j Database Agent
 
 A Google Agent Development Kit (ADK) agent that enables secure natural language querying of Neo4j databases. This agent uses Gemini models to understand user queries and automatically generates appropriate Cypher queries to retrieve data from your Neo4j database.
 
@@ -13,11 +13,21 @@ A Google Agent Development Kit (ADK) agent that enables secure natural language 
 - 🚀 **Cloud Deployment**: Deploy to Vertex AI Agent Engine
 
 ### Enhanced Query Support
-- 📅 **Time-based Queries**: "show orders from last month", "products created today"
-- 📈 **Aggregations**: Count, sum, average with GROUP BY and ORDER BY
-- 💰 **Financial Calculations**: Revenue totals, MRR analysis with grand totals
+- 📅 **Time-based Queries**: Year/month/quarter comparisons, date ranges
+- 📈 **Advanced Aggregations**: Count, sum, average, min, max with GROUP BY
+- 💰 **Financial Calculations**: Revenue totals, running totals, percentages
 - 🔗 **Relationship Analysis**: Customer orders, product categories, connections
-- 📋 **Table Formatting**: Automatic table formatting for multi-row results
+- 📋 **Smart Formatting**: Markdown tables for multi-row, key-value for single results
+- 📊 **Chart Visualizations**: ASCII bar charts for data visualization
+- 🧧 **Invoice Analytics**: Robust invoice counting with correct property handling
+
+### Advanced Analytics
+- 📊 **Grand Totals & Subtotals**: Automatic totals for all numeric columns
+- 📈 **Year-over-Year Analysis**: Compare data across time periods
+- 🎯 **Top N Queries**: Find top customers, products, categories
+- 📊 **Percentage Calculations**: Breakdown by category with percentages
+- 🏃 **Running Totals**: Cumulative calculations over time
+- 📋 **Multiple Aggregations**: Count, sum, average in single query
 
 ### Security Features
 - 🛡️ **Query Intent Analysis**: Fast detection of destructive operations
@@ -36,8 +46,8 @@ A Google Agent Development Kit (ADK) agent that enables secure natural language 
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/your-username/Agentspace-neo4j.git
-cd Agentspace-neo4j
+git clone https://github.com/your-username/neo4j-database-agent.git
+cd neo4j-database-agent
 ```
 
 2. Run the installation script:
@@ -69,67 +79,121 @@ APP_ID=your-app-id
 
 ## Usage
 
-### Local Development & Testing
+### Web UI for Deployment Management
 
-1. Activate the virtual environment:
+1. Start the Flask application:
 ```bash
-source .venv/bin/activate
+./start.sh
 ```
 
-2. Start the ADK web interface:
+2. Navigate to http://localhost:5001
+
+3. Use the web interface to:
+   - Deploy agent to Vertex AI Agent Engine
+   - Test deployed agent
+   - Register to Agentspace
+   - Manage deployed agents
+
+### Direct Deployment
+
 ```bash
-adk web
+# Deploy using the deployment script
+uv run python deployment/deploy.py
+
+# Or test locally first
+uv run python -c "from neo4j_database_agent import root_agent; print(root_agent.name)"
 ```
 
-3. Open your browser and navigate to the provided URL (typically http://localhost:8080)
+## Example Queries
 
-### Example Queries
+The agent supports a wide range of natural language queries with enhanced formatting:
 
-The agent supports a wide range of natural language queries:
-
-#### Basic Queries
+### Basic Queries
 - "List all my customers"
 - "Show me all products" 
 - "Count orders in the database"
 
-#### Time-based Analysis
-- "Show orders from last week"
-- "Products created today"
-- "Revenue from last month"
+### Time-based Analysis
+- "Show invoices by year" → Returns markdown table with totals
+- "Compare quarterly revenue" → Year/quarter breakdown
+- "Monthly sales from last year" → Time period filtering
 
-#### Financial & Business Analytics
-- "List subscription MRR order by customer with grand total"
-- "Top 10 customers by revenue"
-- "Monthly revenue totals"
-- "Customer lifetime value analysis"
+### Financial & Business Analytics
+- "Revenue by customer with totals" → Subtotals and grand totals
+- "Top 10 customers by revenue" → Ranked results
+- "Invoice count by year" → Properly uses `issue_date` property
+- "Show me a chart of invoices per year" → ASCII bar chart
 
-#### Aggregations & Reporting
-- "Count customers by city"
-- "Average order value by product category"
-- "Total sales by region"
+### Advanced Aggregations
+- "Count customers by city with percentages" → Percentage calculations
+- "Running total of monthly sales" → Cumulative calculations
+- "Average order value by product category" → Multiple aggregations
 
-### How It Works
+### Chart Visualizations
+- "Create a bar chart of sales by year"
+- "Show me a graph of customer counts by region"
+- "Visualize invoice distribution by month"
 
-1. **Security Check**: Query intent is analyzed for destructive operations (< 50ms)
-2. **Schema Discovery**: Database schema is retrieved and cached for performance
-3. **Query Generation**: Natural language is converted to optimized Cypher queries
-4. **Execution**: Safe, read-only queries are executed against Neo4j
-5. **Formatting**: Results are presented in business-friendly tables with totals
+## Sample Output Formats
+
+### Single Result
+```
+**total_invoices**: 641
+```
+
+### Multiple Results (Markdown Table)
+```markdown
+| year | count |
+|:----:|:-----:|
+| 2022 | 170   |
+| 2023 | 201   |
+| 2024 | 229   |
+| 2025 | 38    |
+
+**Summary:**
+- Total count: 638
+*Total rows: 4*
+```
+
+### Chart Visualization
+```
+Data Visualization
+==================
+2022 : █████████████████████████████            170
+2023 : ███████████████████████████████████      201
+2024 : ████████████████████████████████████████ 229
+2025 : ██████                                   38
+Total: 638
+```
 
 ## Architecture
 
 ### Core Components
 
 ```
-agents/
-├── agent.py          # Main agent with enhanced instructions and tools
-├── security.py       # Security callback and query intent analysis  
-└── query_utils.py    # Utility functions for common query patterns
+neo4j_database_agent/
+├── __init__.py           # Package exports
+├── agent.py              # Main agent with enhanced instructions and 6 tools
+├── tools.py              # Core tools for querying and visualization
+└── simple_charts.py      # ASCII chart generation
 
-app.py               # Flask web UI for deployment management
-install.sh           # Installation and setup script
-start.sh            # Application startup script
+deployment/
+├── deploy.py             # Vertex AI deployment script
+└── test_deployment.py    # Deployment testing
+
+app.py                    # Flask web UI for deployment management
+install.sh               # Installation and setup script
+start.sh                 # Application startup script
 ```
+
+### Agent Tools (6 Total)
+
+1. **`check_schema_cache`** - Fast schema availability check
+2. **`get_neo4j_schema`** - Database schema discovery and caching
+3. **`execute_cypher_query`** - Standard query execution with table formatting
+4. **`execute_advanced_aggregation`** - Enhanced aggregation with automatic totals
+5. **`create_simple_chart`** - ASCII bar chart generation
+6. **`refresh_neo4j_schema`** - Schema cache refresh
 
 ### Security Architecture
 
@@ -143,33 +207,39 @@ start.sh            # Application startup script
 - **Schema Caching**: First query caches schema, subsequent queries use cache
 - **Connection Pooling**: Efficient Neo4j connection management
 - **Query Optimization**: Automatic LIMIT and ORDER BY suggestions
+- **Smart Formatting**: Single results vs multi-row table detection
 
-## Deployment to Vertex AI
+## Query Patterns Supported
 
-### Web UI Deployment
+### Count & Aggregation
+- Simple counts: `MATCH (n:Node) RETURN count(n) as total`
+- Group counts: `MATCH (n:Node) RETURN n.category, count(n) as count`
+- Multiple aggregations: `count()`, `sum()`, `avg()`, `min()`, `max()`
+- Conditional counts with `WHERE` clauses
 
-1. Start the Flask application:
-```bash
-./start.sh
-```
+### Totals & Subtotals
+- Grand totals: `MATCH (n:Node) RETURN sum(n.amount) as grand_total`
+- Subtotals by group: `MATCH (n:Node) RETURN n.category, sum(n.amount) as subtotal`
+- Multiple totals: count, sum, average in one query
+- **Automatic totals** for all numeric columns
 
-2. Navigate to http://localhost:5000
+### Time & Date Comparisons
+- Year comparison: `date(n.date).year`
+- Month comparison: `date(n.date).month`
+- Quarter comparison: `(date(n.date).month-1)/3+1`
+- Date ranges: `WHERE n.date >= date('2023-01-01')`
+- Year-over-year changes with `lag()` functions
 
-3. Use the web interface to:
-   - Deploy agent to Vertex AI Agent Engine
-   - Test deployed agent
-   - Register to Agentspace
-   - Manage deployed agents
+### Advanced Patterns
+- Percentages: `round(100.0 * count(n) / total, 2)`
+- Running totals: `sum(count(n)) OVER (ORDER BY year)`
+- Top N queries: `ORDER BY count DESC LIMIT 10`
 
-### Manual Deployment
+## Critical Invoice Property
 
-```bash
-# Deploy using ADK CLI
-adk deploy --project YOUR_PROJECT_ID --location europe-west1
-
-# Or test locally first
-python test_agent_local.py
-```
+⚠️ **Important**: For Invoice nodes, the agent correctly uses `issue_date` property (underscore) not `issueDate` (camelCase):
+- ✅ **Correct**: `i.issue_date` - contains complete invoice data (638 invoices)
+- ❌ **Wrong**: `i.issueDate` - contains only partial data (3 invoices)
 
 ## Security
 
@@ -187,26 +257,6 @@ python test_agent_local.py
 - Store credentials securely in `.env` (never commit this file)
 - Use Neo4j read-only users for additional security
 - Monitor query patterns and performance
-
-## Advanced Features
-
-### Grand Total Calculations
-The agent automatically includes grand totals when requested:
-```
-Query: "List subscription MRR by customer with grand total"
-Result: Individual customer MRR + calculated grand total
-```
-
-### Table Formatting
-Multi-row results are automatically formatted as business-friendly tables with:
-- Clear column headers
-- Proper data alignment
-- Grand totals when applicable
-
-### Query Utility Functions
-- `build_time_filter()`: Generate time-based WHERE clauses
-- `build_aggregation_query()`: Create GROUP BY queries
-- `build_grand_total_query()`: Queries with individual values and totals
 
 ## Troubleshooting
 
@@ -229,13 +279,13 @@ Multi-row results are automatically formatted as business-friendly tables with:
 
 ### Adding New Query Types
 
-1. Update agent instructions in `agents/agent.py`
-2. Add utility functions in `agents/query_utils.py` if needed
-3. Test with `adk web`
+1. Update agent instructions in `neo4j_database_agent/agent.py`
+2. Add new tools in `neo4j_database_agent/tools.py` if needed
+3. Test with the web UI
 
 ### Security Enhancements
 
-1. Modify patterns in `agents/security.py`
+1. Modify patterns in query validation
 2. Test with various query types
 3. Ensure < 50ms performance requirement
 
@@ -244,7 +294,7 @@ Multi-row results are automatically formatted as business-friendly tables with:
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Test thoroughly with `adk web`
+4. Test thoroughly with local and deployed agent
 5. Submit a pull request
 
 ## License
