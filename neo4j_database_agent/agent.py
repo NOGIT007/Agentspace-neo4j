@@ -8,7 +8,7 @@ Follows Google ADK patterns for simplicity and reliability.
 import os
 import vertexai
 from google.adk.agents import Agent
-from google.adk.code_executors import VertexAiCodeExecutor
+# from google.adk.code_executors import VertexAiCodeExecutor
 from google.genai import types
 from dotenv import load_dotenv
 
@@ -16,16 +16,11 @@ from .tools import (
     check_schema_cache,
     get_neo4j_schema,
     execute_cypher_query,
-    refresh_neo4j_schema,
-    execute_advanced_aggregation,
-    analyze_graph_paths,
-    calculate_node_centrality,
-    detect_communities,
-    find_similar_nodes
+    refresh_neo4j_schema
 )
 
-# Load environment variables
-load_dotenv()
+# Load environment variables (override existing shell vars)
+load_dotenv(override=True)
 
 # Initialize Vertex AI with correct location
 vertexai.init(
@@ -76,28 +71,9 @@ Query pattern: MATCH (i:Invoice) WHERE i.issue_date IS NOT NULL RETURN date(i.is
 **VISUALIZATION PATTERNS:**
 When users ask for charts, graphs, or visualizations:
 1. Execute the Neo4j query first using execute_cypher_query
-2. Parse the JSON response and extract the data array
-3. Create visualizations using this exact pattern:
-
-```tool_code
-# Parse JSON response from execute_cypher_query
-import json
-result = json.loads(tool_response)  # tool_response is the JSON string from execute_cypher_query
-if 'data' in result:
-    df = pd.DataFrame(result['data'])
-    # Create visualization with plotly
-    fig = px.bar(df, x='column1', y='column2', title='Title')
-    fig.show()
-else:
-    print("No data available for visualization")
-```
-
-4. Chart types:
-   - Bar charts: px.bar(df, x='column1', y='column2', title='Title')
-   - Line charts: px.line(df, x='time_column', y='value_column', title='Title')
-   - Pie charts: px.pie(df, names='category', values='count', title='Title')
-   - Scatter plots: px.scatter(df, x='x_col', y='y_col', title='Title')
-5. Always end with fig.show()
+2. Present the data in a clear table format
+3. Describe what type of chart would be appropriate for the data
+4. Focus on data retrieval and clear presentation rather than complex visualizations
 
 **QUERY PATTERNS FOR ADVANCED OPERATIONS:**
 
@@ -124,13 +100,6 @@ ADVANCED PATTERNS:
 - Running totals: MATCH (n:Node) WHERE n.date IS NOT NULL RETURN date(n.date).year as year, count(n) as count, sum(count(n)) OVER (ORDER BY date(n.date).year) as running_total ORDER BY year
 - Top N: MATCH (n:Node) RETURN n.category, count(n) as count ORDER BY count DESC LIMIT 10
 
-GRAPH ANALYSIS TOOLS:
-Use these specialized tools for graph-specific analysis:
-- analyze_graph_paths: Find shortest paths between nodes
-- calculate_node_centrality: Identify most important/influential nodes
-- detect_communities: Find clusters and communities in the graph
-- find_similar_nodes: Find nodes similar to a reference node
-
 GRAPH QUERY PATTERNS:
 - Path queries: MATCH path = (a)-[*1..3]-(b) WHERE a.id = 'start' AND b.id = 'end'
 - Variable length paths: MATCH (n)-[*1..5]-(m) for multi-hop relationships
@@ -140,13 +109,13 @@ GRAPH QUERY PATTERNS:
 - Common neighbors: MATCH (a)-[]-(common)-[]-(b) WHERE a <> b
 
 RESPONSE FORMAT:
-- Return query results in clean markdown table format for 2+ rows
+- ALWAYS return query results in clean markdown table format for 2+ rows
+- Example: | Year | Count | for year/count data
 - Single results: show as simple key-value pairs
-- For charts/visualizations, generate Python code that creates plotly charts
-- Use px.bar, px.line, px.pie, px.scatter as appropriate
-- Always end plotting code with fig.show()
-- Do not explain what you are doing
-- Simply execute the query and show the results
+- For charts/visualizations, present data clearly in table format first
+- Focus on clear data presentation and insights
+- Always format tabular data as markdown tables
+- Simply execute the query and show the results in proper table format
 
 SECURITY:
 - Only read-only operations allowed (MATCH, RETURN, WITH, ORDER BY, LIMIT)
@@ -163,21 +132,20 @@ root_agent = Agent(
     model=os.getenv("MODEL_NAME", "gemini-2.5-flash"),
     name="neo4j_database_agent",
     instruction=return_instructions(),
-    global_instruction="Agent Neo can help you with questions about subscriptions, customers, tickets, invoices, and products. I can analyze your Neo4j database and provide insights through natural language queries and interactive visualizations.",
-    code_executor=VertexAiCodeExecutor(
-        optimize_data_file=True,
-        stateful=True,
-    ),
+    global_instruction="Hello! I'm Agent Neo, your Neo4j database assistant. I can help you analyze subscriptions, customers, tickets, invoices, and products using natural language queries. What would you like to explore today?",
+    # code_executor=VertexAiCodeExecutor(
+    #     optimize_data_file=True,
+    #     stateful=True,
+    #     timeout=30,  # 30 second timeout
+    # ),
     tools=[
         check_schema_cache,
         get_neo4j_schema,
         execute_cypher_query,
-        refresh_neo4j_schema,
-        execute_advanced_aggregation,
-        analyze_graph_paths,
-        calculate_node_centrality,
-        detect_communities,
-        find_similar_nodes
+        refresh_neo4j_schema
     ],
     generate_content_config=types.GenerateContentConfig(temperature=0.1)
 )
+
+# For ADK CLI compatibility
+agent = root_agent

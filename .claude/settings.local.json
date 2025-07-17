@@ -29,7 +29,11 @@
       "Bash(cp:*)",
       "Bash(git clone:*)",
       "Bash(git commit:*)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(chmod:*)",
+      "Bash(export MODEL_NAME=\"gemini-2.5-pro\")",
+      "Bash(mv:*)",
+      "Bash(pip install:*)"
     ]
   },
   "enabledMcpjsonServers": [

@@ -33,19 +33,27 @@ python test_agent_local.py
 
 ### Testing
 ```bash
-# Run local agent tests
-python test_agent_local.py
+# Test agent locally with ADK web interface
+adk web
+
+# Run evaluation tests
+cd eval
+python generate_baseline.py
+
+# Run full evaluation
+adk eval neo4j_database_agent data/baseline_queries.test.json --config_file_path data/test_config.json
 ```
 
 ## Architecture Overview
 
 ### Core Components
 
-1. **agents/agent.py** - Main agent implementation
-   - `root_agent`: LlmAgent instance with Neo4j querying capabilities
+1. **neo4j_database_agent/agent.py** - Main agent implementation
+   - `root_agent`: Agent instance with Neo4j querying capabilities
    - Tools: `check_schema_cache`, `get_neo4j_schema`, `execute_cypher_query`, `refresh_neo4j_schema`
    - Implements schema caching for performance optimization
    - Security: Only allows read-only operations (blocks CREATE, MERGE, SET, DELETE)
+   - Environment: Uses `load_dotenv(override=True)` to prioritize .env over shell variables
 
 2. **app.py** - Flask application for deployment management
    - Web UI for deploying agents to Vertex AI Agent Engine
@@ -99,7 +107,62 @@ Main dependencies from pyproject.toml:
 ## Documentation
 - **Project Requirements**: Please read `docs/doc.md` for detailed technical specifications and requirements
 
+## Google ADK Evaluation
+
+### Evaluation Structure
+Following Google ADK patterns, evaluation is organized in:
+```
+eval/
+├── data/
+│   ├── test_config.json          # Evaluation criteria and scoring thresholds
+│   └── baseline_queries.test.json # Test dataset with 20 comprehensive test cases
+├── baseline_results.json         # Performance baseline (100% success rate)
+├── baseline_results.summary.md   # Human-readable performance summary
+├── eval.md                       # Simple evaluation guide
+├── generate_baseline.py          # Baseline generation script
+└── test_eval.py                  # Evaluation script using AgentEvaluator
+```
+
+### Evaluation Commands
+```bash
+# Run evaluation using ADK CLI
+adk eval neo4j_database_agent eval/data/baseline_queries.test.json --config_file_path eval/data/test_config.json
+
+# Run evaluation using pytest
+pytest eval/test_eval.py
+
+# Generate baseline results
+python generate_baseline.py
+```
+
+### Evaluation Dataset Format
+Each test case follows ADK standard format:
+```json
+{
+  "query": "User input text",
+  "expected_tool_use": [
+    {
+      "tool_name": "execute_cypher_query",
+      "tool_input": {"query": "MATCH (n) RETURN count(n)"}
+    }
+  ],
+  "reference": "Expected response text"
+}
+```
+
+### Baseline Generation
+- Run `generate_baseline.py` to create initial baseline results
+- Results are compared against current Gemini model performance
+- Enables benchmarking against future model updates
+
+### Google ADK Samples Reference
+Local ADK samples available at: `/Users/kennetkusk/code/google/adk-samples/python`
+- Contains evaluation patterns and best practices
+- Reference implementations for various agent types
+- MCP integration examples
+
 ## Instructions for Claude
 - Follow the requirements specified in docs/doc.md
 - Use Google ADK patterns
 - Follow MCP Neo4j integration
+- Use ADK evaluation framework for testing

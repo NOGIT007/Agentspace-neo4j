@@ -10,8 +10,8 @@ from vertexai.preview.reasoning_engines import ReasoningEngine, AdkApp
 import vertexai
 import logging
 
-# Load environment variables
-load_dotenv()
+# Load environment variables (override existing shell vars)
+load_dotenv(override=True)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

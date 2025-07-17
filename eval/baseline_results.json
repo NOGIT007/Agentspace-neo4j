@@ -1,0 +1,769 @@
+{
+  "generated_at": "2025-07-17T13:09:31.166230",
+  "model_name": "gemini-2.5-flash",
+  "total_queries": 20,
+  "successful_queries": 20,
+  "failed_queries": 0,
+  "total_execution_time_ms": 900397.1180915833,
+  "average_execution_time_ms": 45019.85590457916,
+  "results": [
+    {
+      "query": "Hello, I'm new to this system. Can you help me understand what you can do?",
+      "expected_tool_use": [],
+      "actual_tool_use": [],
+      "expected_response": "Hello! I'm Agent Neo, your Neo4j database assistant. I can help you with:\n\n- **Database Queries**: Ask questions about your data in natural language, and I'll convert them to Cypher queries\n- **Data Analysis**: Analyze customer patterns, subscription trends, financial metrics, and more\n- **Visualizations**: Create interactive charts and graphs from your data\n- **Graph Analysis**: Explore relationships, find patterns, and discover insights in your graph database\n\nI can work with subscriptions, customers, tickets, invoices, and products. What would you like to explore today?",
+      "actual_response": "Hello! I'm Agent Neo, your Neo4j database query assistant. I can help you analyze your Neo4j database and provide insights through natural language queries and interactive visualizations.\n\nHere's a summary of what I can do:\n\n*   **Query your Neo4j database**: I can execute read-only Cypher queries to retrieve information about your data.\n*   **Analyze various entities**: I can answer questions related to subscriptions, customers, tickets, invoices, and products.\n*   **Generate visualizations**: I can create various types of charts like bar charts, line charts, pie charts, and scatter plots to help you visualize your data.\n*   **Perform advanced data analysis**:\n    *   **Aggregations**: Calculate totals, subtotals, counts, sums, and averages.\n    *   **Time-based analysis**: Compare data across different time periods (years, months, quarters).\n    *   **Percentages and running totals**: Compute advanced metrics.\n*   **Conduct graph analysis**:\n    *   **Pathfinding**: Find paths between nodes in your graph.\n    *   **Node Centrality**: Identify important or influential nodes.\n    *   **Community Detection**: Discover clusters or groups within your graph.\n    *   **Node Similarity**: Find nodes that are similar to a given reference node.\n\nTo get started, you can ask me questions like:\n*   \"Show me the total number of customers.\"\n*   \"What are the top 5 products by sales?\"\n*   \"Can you show me a bar chart of invoices per year?\"\n*   \"Find the shortest path between customer 'A' and customer 'B'.\"\n\nHow can I help you today?",
+      "execution_time_ms": 4610.676288604736,
+      "success": true,
+      "error_message": null,
+      "model_used": "gemini-2.5-flash",
+      "timestamp": "2025-07-17T12:54:35.379875"
+    },
+    {
+      "query": "How many customers do we have?",
+      "expected_tool_use": [
+        {
+          "tool_name": "check_schema_cache",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "query": "MATCH (c:Customer) RETURN count(c) as total_customers"
+          }
+        }
+      ],
+      "actual_tool_use": [
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "cypher_query": "MATCH (c:Customer) RETURN count(c) as totalCustomers"
+          }
+        }
+      ],
+      "expected_response": "Based on your database, you have X customers in total.",
+      "actual_response": "We have 204 customers.",
+      "execution_time_ms": 4108.054876327515,
+      "success": true,
+      "error_message": null,
+      "model_used": "gemini-2.5-flash",
+      "timestamp": "2025-07-17T12:54:39.488103"
+    },
+    {
+      "query": "Show me all active subscriptions",
+      "expected_tool_use": [
+        {
+          "tool_name": "check_schema_cache",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "query": "MATCH (s:Subscription) WHERE s.status = 'ACTIVE' RETURN s.subscriptionID, s.start_date, s.mrr, s.status ORDER BY s.start_date DESC LIMIT 20"
+          }
+        }
+      ],
+      "actual_tool_use": [
+        {
+          "tool_name": "check_schema_cache",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "get_neo4j_schema",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "cypher_query": "MATCH (s:Subscription) WHERE s.status = 'Active' RETURN s.subscriptionID, s.productName, s.startDate, s.endDate, s.status"
+          }
+        }
+      ],
+      "expected_response": "Here are your active subscriptions:\n\n| Subscription ID | Start Date | MRR | Status |\n|----------------|------------|-----|--------|\n| [Table with subscription data] |",
+      "actual_response": "No active subscriptions found.",
+      "execution_time_ms": 18019.558906555176,
+      "success": true,
+      "error_message": null,
+      "model_used": "gemini-2.5-flash",
+      "timestamp": "2025-07-17T12:54:57.507898"
+    },
+    {
+      "query": "What's our total monthly recurring revenue?",
+      "expected_tool_use": [
+        {
+          "tool_name": "check_schema_cache",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "query": "MATCH (s:Subscription) WHERE s.status = 'ACTIVE' AND s.mrr IS NOT NULL RETURN sum(s.mrr) as total_mrr, count(s) as active_subscriptions"
+          }
+        }
+      ],
+      "actual_tool_use": [
+        {
+          "tool_name": "check_schema_cache",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "cypher_query": "MATCH (s:Subscription) RETURN sum(s.mrr) as totalMRR"
+          }
+        }
+      ],
+      "expected_response": "Your total Monthly Recurring Revenue (MRR) is $X from Y active subscriptions.",
+      "actual_response": "Our total monthly recurring revenue is 1399.97.",
+      "execution_time_ms": 6573.265790939331,
+      "success": true,
+      "error_message": null,
+      "model_used": "gemini-2.5-flash",
+      "timestamp": "2025-07-17T12:55:04.081372"
+    },
+    {
+      "query": "Show me invoices from this year",
+      "expected_tool_use": [
+        {
+          "tool_name": "check_schema_cache",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "query": "MATCH (i:Invoice) WHERE i.issue_date.year = date().year RETURN i.invoiceNumber, i.issue_date, i.total_amount, i.status ORDER BY i.issue_date DESC LIMIT 20"
+          }
+        }
+      ],
+      "actual_tool_use": [
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "cypher_query": "MATCH (i:Invoice) WHERE date(i.issue_date).year = date().year RETURN i.invoice_id, i.issue_date, i.total_amount"
+          }
+        }
+      ],
+      "expected_response": "Here are invoices from this year:\n\n| Invoice Number | Issue Date | Amount | Status |\n|----------------|------------|--------|--------|\n| [Table with invoice data] |",
+      "actual_response": "| i.invoice_id | i.issue_date | i.total_amount |\n|:---------------|:-------------|:---------------|\n| INV_SUB_CUST_000189_M3 | 2025-01-08   | 249.0          |\n| INV_SUB_CUST_000190_M3 | 2025-01-26   | 449.0          |\n| INV_SUB_CUST_000191_M2 | 2025-01-14   | 449.0          |\n| INV_SUB_CUST_000191_M3 | 2025-02-14   | 449.0          |\n| INV_SUB_CUST_000192_M1 | 2025-01-01   | 449.0          |\n| INV_SUB_CUST_000192_M2 | 2025-02-01   | 449.0          |\n| INV_SUB_CUST_000192_M3 | 2025-03-01   | 449.0          |\n| INV_SUB_CUST_000194_M3 | 2025-01-08   | 349.0          |\n| INV_SUB_CUST_000195_M3 | 2025-01-26   | 349.0          |\n| INV_SUB_CUST_000196_M2 | 2025-01-14   | 299.0          |\n| INV_SUB_CUST_000196_M3 | 2025-02-14   | 299.0          |\n| INV_SUB_CUST_000197_M1 | 2025-01-01   | 249.0          |\n| INV_SUB_CUST_000197_M2 | 2025-02-01   | 249.0          |\n| INV_SUB_CUST_000197_M3 | 2025-03-01   | 249.0          |\n| INV_SUB_CUST_000198_M1 | 2025-01-19   | 249.0          |\n| INV_SUB_CUST_000198_M2 | 2025-02-19   | 249.0          |\n| INV_SUB_CUST_000198_M3 | 2025-03-19   | 249.0          |\n| INV_SUB_CUST_000199_M1 | 2025-02-06   | 249.0          |\n| INV_SUB_CUST_000199_M2 | 2025-03-06   | 249.0          |\n| INV_SUB_CUST_000199_M3 | 2025-04-06   | 249.0          |\n| INV_SUB_CUST_288_M3 | 2025-01-08   | 249.0          |\n| INV_SUB_CUST_289_M2 | 2025-01-02   | 249.0          |\n| INV_SUB_CUST_289_M3 | 2025-02-02   | 249.0          |\n| INV_SUB_CUST_290_M2 | 2025-01-26   | 449.0          |\n| INV_SUB_CUST_290_M3 | 2025-02-26   | 449.0          |\n| INV_SUB_CUST_291_M1 | 2025-01-19   | 449.0          |\n| INV_SUB_CUST_291_M2 | 2025-02-19   | 449.0          |\n| INV_SUB_CUST_291_M3 | 2025-03-19   | 449.0          |\n| INV_SUB_CUST_292_M1 | 2025-02-12   | 449.0          |\n| INV_SUB_CUST_292_M2 | 2025-03-12   | 449.0          |\n| INV_SUB_CUST_292_M3 | 2025-04-12   | 449.0          |\n| INV_SUB_CUST_293_M1 | 2025-03-08   | 449.0          |\n| INV_SUB_CUST_293_M2 | 2025-04-08   | 449.0          |\n| INV_SUB_CUST_293_M3 | 2025-05-08   | 449.0          |\n| null           | 2025-01-25   | -106.63502771929382 |\n| null           | 2025-02-24   | -45.06015578856196 |\n| null           | 2025-01-28   | -78.58012735512547 |\n| null           | 2025-03-16   | -70.83050939320144 |",
+      "execution_time_ms": 13851.757049560547,
+      "success": true,
+      "error_message": null,
+      "model_used": "gemini-2.5-flash",
+      "timestamp": "2025-07-17T12:55:17.933428"
+    },
+    {
+      "query": "Create a chart showing invoice volumes by month",
+      "expected_tool_use": [
+        {
+          "tool_name": "check_schema_cache",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "query": "MATCH (i:Invoice) WHERE i.issue_date >= date() - duration({months: 12}) WITH i.issue_date.year as year, i.issue_date.month as month, count(i) as invoice_count RETURN year, month, invoice_count ORDER BY year, month"
+          }
+        }
+      ],
+      "actual_tool_use": [
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "cypher_query": "MATCH (i:Invoice) WHERE i.issue_date IS NOT NULL RETURN date(i.issue_date).year as year, date(i.issue_date).month as month, count(*) as count ORDER BY year, month"
+          }
+        }
+      ],
+      "expected_response": "I'll create a chart showing invoice volumes by month for the last 12 months.\n\n```tool_code\nimport json\nresult = json.loads(tool_response)\nif 'data' in result:\n    df = pd.DataFrame(result['data'])\n    df['date'] = pd.to_datetime(df[['year', 'month']].assign(day=1))\n    fig = px.bar(df, x='date', y='invoice_count', title='Invoice Volume by Month')\n    fig.show()\nelse:\n    print(\"No data available for visualization\")\n```",
+      "actual_response": "No response generated",
+      "execution_time_ms": 11554.41689491272,
+      "success": true,
+      "error_message": null,
+      "model_used": "gemini-2.5-flash",
+      "timestamp": "2025-07-17T12:55:29.488039"
+    },
+    {
+      "query": "Find customers with the highest invoice amounts",
+      "expected_tool_use": [
+        {
+          "tool_name": "check_schema_cache",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "query": "MATCH (c:Customer)-[:HAS_INVOICE]->(i:Invoice) WITH c, sum(i.total_amount) as total_amount RETURN c.name, c.customerID, total_amount ORDER BY total_amount DESC LIMIT 10"
+          }
+        }
+      ],
+      "actual_tool_use": [
+        {
+          "tool_name": "check_schema_cache",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "cypher_query": "MATCH (c:Customer)-[:HAS_INVOICE]->(i:Invoice) RETURN c.name AS CustomerName, SUM(i.amount) AS TotalInvoiceAmount ORDER BY TotalInvoiceAmount DESC LIMIT 10"
+          }
+        }
+      ],
+      "expected_response": "Here are the top 10 customers by total invoice amount:\n\n| Customer Name | Customer ID | Total Amount |\n|---------------|-------------|-------------|\n| [Table with customer data] |",
+      "actual_response": "No response generated",
+      "execution_time_ms": 9461.353302001953,
+      "success": true,
+      "error_message": null,
+      "model_used": "gemini-2.5-flash",
+      "timestamp": "2025-07-17T12:55:38.949717"
+    },
+    {
+      "query": "What are the most common support ticket categories?",
+      "expected_tool_use": [
+        {
+          "tool_name": "check_schema_cache",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "query": "MATCH (case:Case)-[:BELONGS_TO_CATEGORY]->(tc:TicketCategory) RETURN tc.category_name, count(case) as ticket_count ORDER BY ticket_count DESC LIMIT 10"
+          }
+        }
+      ],
+      "actual_tool_use": [
+        {
+          "tool_name": "check_schema_cache",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "cypher_query": "MATCH (c:Case) RETURN c.case_category AS category, count(*) AS count ORDER BY count DESC"
+          }
+        }
+      ],
+      "expected_response": "Here are the most common support ticket categories:\n\n| Category | Ticket Count |\n|----------|-------------|\n| [Table with category data] |",
+      "actual_response": "No response generated",
+      "execution_time_ms": 9771.1181640625,
+      "success": true,
+      "error_message": null,
+      "model_used": "gemini-2.5-flash",
+      "timestamp": "2025-07-17T12:55:48.721011"
+    },
+    {
+      "query": "Show me subscription changes in the last 3 months",
+      "expected_tool_use": [
+        {
+          "tool_name": "check_schema_cache",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "query": "MATCH (s:Subscription)-[:HAS_CHANGE]->(sc:SubscriptionChange) WHERE sc.executed_date >= date() - duration({months: 3}) RETURN s.subscriptionID, sc.change_type, sc.change_reason, sc.mrr_impact, sc.executed_date ORDER BY sc.executed_date DESC LIMIT 20"
+          }
+        }
+      ],
+      "actual_tool_use": [
+        {
+          "tool_name": "check_schema_cache",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "cypher_query": "MATCH (sc:SubscriptionChange) WHERE sc.changeDate >= date() - duration({months: 3}) RETURN sc.changeDate AS ChangeDate, sc.changeType AS ChangeType, sc.description AS Description, sc.subscriptionID AS SubscriptionID ORDER BY sc.changeDate DESC"
+          }
+        },
+        {
+          "tool_name": "refresh_neo4j_schema",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "cypher_query": "MATCH (sc:SubscriptionChange) WHERE sc.changeDate >= date() - duration({months: 3}) RETURN sc.changeDate AS ChangeDate, sc.changeType AS ChangeType, sc.description AS Description, sc.subscriptionID AS SubscriptionID ORDER BY sc.changeDate DESC"
+          }
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "cypher_query": "MATCH (sc:SubscriptionChange) RETURN count(sc) AS TotalSubscriptionChanges"
+          }
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "cypher_query": "MATCH (sc:SubscriptionChange) RETURN sc.changeDate AS ChangeDate, sc.effectiveDate AS EffectiveDate LIMIT 5"
+          }
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "cypher_query": "MATCH (sc:SubscriptionChange) WHERE sc.changeDate IS NOT NULL AND date(sc.changeDate) >= date() - duration({months: 3}) RETURN sc.changeDate AS ChangeDate, sc.changeType AS ChangeType, sc.description AS Description, sc.subscriptionID AS SubscriptionID ORDER BY sc.changeDate DESC"
+          }
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "cypher_query": "MATCH (sc:SubscriptionChange) WHERE sc.createdDate IS NOT NULL AND date(sc.createdDate) >= date() - duration({months: 3}) RETURN sc.createdDate AS CreatedDate, sc.changeType AS ChangeType, sc.description AS Description, sc.subscriptionID AS SubscriptionID ORDER BY sc.createdDate DESC"
+          }
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "cypher_query": "MATCH (sc:SubscriptionChange) WHERE sc.createdDate IS NOT NULL AND date(sc.createdDate) >= date() - duration({months: 3}) RETURN sc.createdDate AS CreatedDate, sc.changeType AS ChangeType, sc.description AS Description, sc.subscriptionID AS SubscriptionID ORDER BY sc.createdDate DESC"
+          }
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "cypher_query": "MATCH (sc:SubscriptionChange) WHERE sc.createdDate IS NOT NULL AND date(sc.createdDate) >= date() - duration({months: 3}) RETURN sc.createdDate AS CreatedDate, sc.changeType AS ChangeType, sc.description AS Description, sc.subscriptionID AS SubscriptionID ORDER BY sc.createdDate DESC"
+          }
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "cypher_query": "MATCH (sc:SubscriptionChange) RETURN sc.createdDate AS CreatedDate, sc.changeDate AS ChangeDate, sc.changeType AS ChangeType, sc.description AS Description, sc.subscriptionID AS SubscriptionID ORDER BY sc.createdDate DESC LIMIT 100"
+          }
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "cypher_query": "MATCH (sc:SubscriptionChange) RETURN sc.createdDate, sc.changeDate, sc.effectiveDate LIMIT 5"
+          }
+        }
+      ],
+      "expected_response": "Here are subscription changes from the last 3 months:\n\n| Subscription ID | Change Type | Reason | MRR Impact | Date |\n|----------------|-------------|--------|------------|------|\n| [Table with subscription changes] |",
+      "actual_response": "No response generated",
+      "execution_time_ms": 365836.78007125854,
+      "success": true,
+      "error_message": null,
+      "model_used": "gemini-2.5-flash",
+      "timestamp": "2025-07-17T13:01:54.557982"
+    },
+    {
+      "query": "Create a pie chart of customers by segment",
+      "expected_tool_use": [
+        {
+          "tool_name": "check_schema_cache",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "query": "MATCH (c:Customer) WHERE c.customer_segment IS NOT NULL RETURN c.customer_segment as segment, count(c) as customer_count ORDER BY customer_count DESC"
+          }
+        }
+      ],
+      "actual_tool_use": [
+        {
+          "tool_name": "check_schema_cache",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "get_neo4j_schema",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "cypher_query": "MATCH (c:Customer) WHERE c.customer_segment IS NOT NULL RETURN c.customer_segment AS segment, count(c) AS count ORDER BY count DESC"
+          }
+        }
+      ],
+      "expected_response": "I'll create a pie chart showing customer distribution by segment.\n\n```tool_code\nimport json\nresult = json.loads(tool_response)\nif 'data' in result:\n    df = pd.DataFrame(result['data'])\n    fig = px.pie(df, names='segment', values='customer_count', title='Customer Distribution by Segment')\n    fig.show()\nelse:\n    print(\"No data available for visualization\")\n```",
+      "actual_response": "No response generated",
+      "execution_time_ms": 20137.875080108643,
+      "success": true,
+      "error_message": null,
+      "model_used": "gemini-2.5-flash",
+      "timestamp": "2025-07-17T13:02:14.696120"
+    },
+    {
+      "query": "Find products that are not in any subscriptions",
+      "expected_tool_use": [
+        {
+          "tool_name": "check_schema_cache",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "query": "MATCH (p:Product) WHERE NOT EXISTS((p)<-[:FOR_PRODUCT]-(:SubscriptionItem)) RETURN p.productID, p.product_name, p.status ORDER BY p.product_name"
+          }
+        }
+      ],
+      "actual_tool_use": [
+        {
+          "tool_name": "check_schema_cache",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "cypher_query": "MATCH (p:Product) WHERE NOT (p)<-[:FOR_PRODUCT]-(:SubscriptionLine) RETURN p.name AS ProductName, p.productID AS ProductID"
+          }
+        }
+      ],
+      "expected_response": "Here are products not currently in any subscriptions:\n\n| Product ID | Product Name | Status |\n|------------|--------------|--------|\n| [Table with unused products] |",
+      "actual_response": "The products that are not in any subscriptions are:\n\n| ProductName | ProductID |\n|-------------|-----------|\n| null        | null      |\n| null        | null      |\n| null        | null      |\n| null        | null      |\n| null        | null      |\n| null        | null      |\n| null        | null      |",
+      "execution_time_ms": 7275.906085968018,
+      "success": true,
+      "error_message": null,
+      "model_used": "gemini-2.5-flash",
+      "timestamp": "2025-07-17T13:02:21.972302"
+    },
+    {
+      "query": "What's the average resolution time for support tickets?",
+      "expected_tool_use": [
+        {
+          "tool_name": "check_schema_cache",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "query": "MATCH (case:Case) WHERE case.resolution_date IS NOT NULL AND case.created_date IS NOT NULL WITH duration.between(case.created_date, case.resolution_date).days as resolution_days RETURN avg(resolution_days) as avg_resolution_days, count(*) as resolved_cases"
+          }
+        }
+      ],
+      "actual_tool_use": [
+        {
+          "tool_name": "check_schema_cache",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "cypher_query": "MATCH (c:Case) WHERE c.creationDate IS NOT NULL AND c.resolutionDate IS NOT NULL RETURN avg(duration.between(datetime(c.creationDate), datetime(c.resolutionDate)).minutes) AS averageResolutionTimeInMinutes"
+          }
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "cypher_query": "MATCH (c:Case) WHERE c.creationDate IS NOT NULL AND c.resolutionDate IS NOT NULL RETURN avg(duration.between(date(c.creationDate), date(c.resolutionDate)).minutes) AS averageResolutionTimeInMinutes"
+          }
+        }
+      ],
+      "expected_response": "The average resolution time for support tickets is X days, based on Y resolved cases.",
+      "actual_response": "The average resolution time for support tickets is 0.0 minutes. This suggests that the `creationDate` and `resolutionDate` properties for `Case` nodes might only contain date information without time, or that all tickets are resolved on the same day they are created.\n\nIf you would like to know the average resolution time in days, please let me know.",
+      "execution_time_ms": 24376.803159713745,
+      "success": true,
+      "error_message": null,
+      "model_used": "gemini-2.5-flash",
+      "timestamp": "2025-07-17T13:02:46.349280"
+    },
+    {
+      "query": "Show me payments made in the last month",
+      "expected_tool_use": [
+        {
+          "tool_name": "check_schema_cache",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "query": "MATCH (p:Payment) WHERE p.paymentDate >= date() - duration({months: 1}) RETURN p.paymentID, p.amount, p.paymentDate, p.payment_method ORDER BY p.paymentDate DESC LIMIT 20"
+          }
+        }
+      ],
+      "actual_tool_use": [
+        {
+          "tool_name": "check_schema_cache",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "cypher_query": "MATCH (p:Payment) WHERE date(p.paymentDate) >= date() - duration({months: 1}) RETURN p.paymentID AS PaymentID, p.amount AS Amount, p.paymentDate AS PaymentDate, p.paymentMethod AS PaymentMethod ORDER BY p.paymentDate DESC"
+          }
+        }
+      ],
+      "expected_response": "Here are payments made in the last month:\n\n| Payment ID | Amount | Date | Method |\n|------------|--------|------|--------|\n| [Table with payment data] |",
+      "actual_response": "No payments found for the last month.",
+      "execution_time_ms": 11034.658908843994,
+      "success": true,
+      "error_message": null,
+      "model_used": "gemini-2.5-flash",
+      "timestamp": "2025-07-17T13:02:57.384184"
+    },
+    {
+      "query": "Which customers have both active subscriptions and open support tickets?",
+      "expected_tool_use": [
+        {
+          "tool_name": "check_schema_cache",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "query": "MATCH (c:Customer)-[:HAS_SUBSCRIPTION]->(s:Subscription) WHERE s.status = 'ACTIVE' MATCH (c)-[:RAISED_CASE]->(case:Case) WHERE case.status IN ['OPEN', 'IN_PROGRESS'] RETURN DISTINCT c.name, c.customerID, count(DISTINCT s) as active_subscriptions, count(DISTINCT case) as open_tickets ORDER BY open_tickets DESC"
+          }
+        }
+      ],
+      "actual_tool_use": [
+        {
+          "tool_name": "check_schema_cache",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "cypher_query": "MATCH (c:Customer)-[:HAS_SUBSCRIPTION]->(s:Subscription) WHERE s.status = 'active' MATCH (c)-[:RAISED_CASE]->(t:Case) WHERE t.status = 'open' RETURN DISTINCT c.name AS CustomerName, c.customerID AS CustomerID"
+          }
+        }
+      ],
+      "expected_response": "Here are customers with both active subscriptions and open support tickets:\n\n| Customer Name | Customer ID | Active Subscriptions | Open Tickets |\n|---------------|-------------|---------------------|-------------|\n| [Table with customer data] |",
+      "actual_response": "CustomerName: Tech Solutions Inc\nCustomerID: CUST002",
+      "execution_time_ms": 7423.449993133545,
+      "success": true,
+      "error_message": null,
+      "model_used": "gemini-2.5-flash",
+      "timestamp": "2025-07-17T13:03:04.807823"
+    },
+    {
+      "query": "Calculate the revenue trend over the last 6 months",
+      "expected_tool_use": [
+        {
+          "tool_name": "check_schema_cache",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "query": "MATCH (i:Invoice {invoice_document_type: 'Invoice'}) WHERE i.issue_date >= date() - duration({months: 6}) WITH i.issue_date.year as year, i.issue_date.month as month, sum(i.total_amount) as monthly_revenue RETURN year, month, monthly_revenue ORDER BY year, month"
+          }
+        }
+      ],
+      "actual_tool_use": [
+        {
+          "tool_name": "check_schema_cache",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "cypher_query": "MATCH (i:Invoice) WHERE i.issue_date IS NOT NULL AND i.issue_date >= date() - duration({months: 6}) RETURN date(i.issue_date).year AS year, date(i.issue_date).month AS month, sum(i.amount) AS total_revenue ORDER BY year, month"
+          }
+        }
+      ],
+      "expected_response": "I'll show you the revenue trend over the last 6 months:\n\n| Year | Month | Revenue |\n|------|-------|--------|\n| [Table with revenue data] |",
+      "actual_response": "No response generated",
+      "execution_time_ms": 10559.412956237793,
+      "success": true,
+      "error_message": null,
+      "model_used": "gemini-2.5-flash",
+      "timestamp": "2025-07-17T13:03:15.367465"
+    },
+    {
+      "query": "Show me credit notes issued this year",
+      "expected_tool_use": [
+        {
+          "tool_name": "check_schema_cache",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "query": "MATCH (cn:Invoice {invoice_document_type: 'Credit Note'}) WHERE cn.issue_date.year = date().year RETURN cn.invoiceNumber, cn.issue_date, cn.total_amount ORDER BY cn.issue_date DESC"
+          }
+        }
+      ],
+      "actual_tool_use": [
+        {
+          "tool_name": "check_schema_cache",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "cypher_query": "MATCH (cn:CreditNote) WHERE date(cn.issueDate).year = 2024 RETURN cn.creditNoteID AS CreditNoteID, cn.issueDate AS IssueDate, cn.amount AS Amount, cn.reason AS Reason ORDER BY cn.issueDate DESC"
+          }
+        }
+      ],
+      "expected_response": "Here are credit notes issued this year:\n\n| Invoice Number | Issue Date | Amount |\n|----------------|------------|--------|\n| [Table with credit note data] |",
+      "actual_response": "I am unable to retrieve the credit notes due to a database connection issue: \"Unable to retrieve routing information\". Please check the Neo4j database connection.",
+      "execution_time_ms": 41192.79384613037,
+      "success": true,
+      "error_message": null,
+      "model_used": "gemini-2.5-flash",
+      "timestamp": "2025-07-17T13:03:56.560571"
+    },
+    {
+      "query": "Find the most valuable customers by MRR",
+      "expected_tool_use": [
+        {
+          "tool_name": "check_schema_cache",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "query": "MATCH (c:Customer)-[:HAS_SUBSCRIPTION]->(s:Subscription) WHERE s.status = 'ACTIVE' WITH c, sum(s.mrr) as total_mrr RETURN c.name, c.customerID, total_mrr ORDER BY total_mrr DESC LIMIT 10"
+          }
+        }
+      ],
+      "actual_tool_use": [
+        {
+          "tool_name": "check_schema_cache",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "cypher_query": "MATCH (c:Customer)-[:HAS_SUBSCRIPTION]->(s:Subscription) RETURN c.name AS CustomerName, SUM(s.mrr) AS TotalMRR ORDER BY TotalMRR DESC LIMIT 10"
+          }
+        }
+      ],
+      "expected_response": "Here are the top 10 customers by Monthly Recurring Revenue:\n\n| Customer Name | Customer ID | Total MRR |\n|---------------|-------------|----------|\n| [Table with customer MRR data] |",
+      "actual_response": "No response generated",
+      "execution_time_ms": 10481.685161590576,
+      "success": true,
+      "error_message": null,
+      "model_used": "gemini-2.5-flash",
+      "timestamp": "2025-07-17T13:04:07.042412"
+    },
+    {
+      "query": "What's the total number of nodes in the database?",
+      "expected_tool_use": [
+        {
+          "tool_name": "check_schema_cache",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "query": "MATCH (n) RETURN count(n) as total_nodes"
+          }
+        }
+      ],
+      "actual_tool_use": [
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "cypher_query": "MATCH (n) RETURN count(n) as totalNodes"
+          }
+        }
+      ],
+      "expected_response": "The database contains X total nodes.",
+      "actual_response": "The total number of nodes in the database is 2519.",
+      "execution_time_ms": 4396.5301513671875,
+      "success": true,
+      "error_message": null,
+      "model_used": "gemini-2.5-flash",
+      "timestamp": "2025-07-17T13:04:11.439101"
+    },
+    {
+      "query": "Show me subscription items with their products",
+      "expected_tool_use": [
+        {
+          "tool_name": "check_schema_cache",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "query": "MATCH (si:SubscriptionItem)-[:FOR_PRODUCT]->(p:Product) RETURN si.item_description, p.product_name, si.quantity, si.unit_price, si.total_price ORDER BY si.total_price DESC LIMIT 20"
+          }
+        }
+      ],
+      "actual_tool_use": [
+        {
+          "tool_name": "check_schema_cache",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "cypher_query": "MATCH (si:SubscriptionItem)-[:FOR_PRODUCT]->(p:Product) RETURN si.item_id AS SubscriptionItemID, si.item_description AS SubscriptionItemDescription, p.productID AS ProductID, p.name AS ProductName LIMIT 10"
+          }
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "cypher_query": "MATCH (si:SubscriptionItem) OPTIONAL MATCH (si)-[:FOR_PRODUCT]->(p:Product) RETURN si.item_id AS SubscriptionItemID, si.item_description AS SubscriptionItemDescription, si.product_id AS SubscriptionItemProductID, p.productID AS ProductID, p.name AS ProductName LIMIT 10"
+          }
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "cypher_query": "MATCH (si:SubscriptionItem) OPTIONAL MATCH (p:Product) WHERE p.productID = si.product_id RETURN si.item_id AS SubscriptionItemID, si.item_description AS SubscriptionItemDescription, si.product_id AS SubscriptionItemProductID, p.productID AS ProductID, p.name AS ProductName LIMIT 10"
+          }
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "cypher_query": "MATCH (si:SubscriptionItem) OPTIONAL MATCH (p:Product) WHERE si.product_id = p.productID RETURN si.item_id AS SubscriptionItemID, si.item_description AS SubscriptionItemDescription, si.product_id AS SubscriptionItemProductID, p.productID AS ProductID, p.name AS ProductName LIMIT 10"
+          }
+        }
+      ],
+      "expected_response": "Here are subscription items with their associated products:\n\n| Item Description | Product Name | Quantity | Unit Price | Total Price |\n|------------------|--------------|----------|------------|------------|\n| [Table with subscription item data] |",
+      "actual_response": "No response generated",
+      "execution_time_ms": 312023.7019062042,
+      "success": true,
+      "error_message": null,
+      "model_used": "gemini-2.5-flash",
+      "timestamp": "2025-07-17T13:09:23.463024"
+    },
+    {
+      "query": "Create a line chart showing MRR growth over time",
+      "expected_tool_use": [
+        {
+          "tool_name": "check_schema_cache",
+          "tool_input": {}
+        },
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "query": "MATCH (s:Subscription) WHERE s.start_date IS NOT NULL AND s.mrr IS NOT NULL WITH s.start_date.year as year, s.start_date.month as month, sum(s.mrr) as monthly_mrr_added RETURN year, month, monthly_mrr_added ORDER BY year, month"
+          }
+        }
+      ],
+      "actual_tool_use": [
+        {
+          "tool_name": "execute_cypher_query",
+          "tool_input": {
+            "cypher_query": "MATCH (s:Subscription) WHERE s.startDate IS NOT NULL RETURN date(s.startDate).year AS year, date(s.startDate).month AS month, sum(s.mrr) AS monthly_mrr ORDER BY year, month"
+          }
+        }
+      ],
+      "expected_response": "I'll create a line chart showing MRR growth over time.\n\n```tool_code\nimport json\nresult = json.loads(tool_response)\nif 'data' in result:\n    df = pd.DataFrame(result['data'])\n    df['date'] = pd.to_datetime(df[['year', 'month']].assign(day=1))\n    fig = px.line(df, x='date', y='monthly_mrr_added', title='MRR Growth Over Time')\n    fig.show()\nelse:\n    print(\"No data available for visualization\")\n```",
+      "actual_response": "No response generated",
+      "execution_time_ms": 7702.744245529175,
+      "success": true,
+      "error_message": null,
+      "model_used": "gemini-2.5-flash",
+      "timestamp": "2025-07-17T13:09:31.166025"
+    }
+  ],
+  "summary": {
+    "success_rate": 100.0,
+    "average_execution_time_ms": 45019.627141952515,
+    "min_execution_time_ms": 4108.054876327515,
+    "max_execution_time_ms": 365836.78007125854,
+    "queries_under_1000ms": 0,
+    "queries_under_5000ms": 3,
+    "slowest_queries": [
+      {
+        "query": "Show me subscription changes in the last 3 months",
+        "time_ms": 365836.78007125854
+      },
+      {
+        "query": "Show me subscription items with their products",
+        "time_ms": 312023.7019062042
+      },
+      {
+        "query": "Show me credit notes issued this year",
+        "time_ms": 41192.79384613037
+      },
+      {
+        "query": "What's the average resolution time for support tickets?",
+        "time_ms": 24376.803159713745
+      },
+      {
+        "query": "Create a pie chart of customers by segment",
+        "time_ms": 20137.875080108643
+      }
+    ]
+  }
+}

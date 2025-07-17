@@ -12,8 +12,8 @@ from datetime import date, datetime
 from neo4j import GraphDatabase
 from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
+# Load environment variables (override existing shell vars)
+load_dotenv(override=True)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -39,20 +39,22 @@ def _make_serializable(obj):
 def _execute_query(query: str, params: dict = None) -> str:
     """
     Private helper function to execute a Cypher query safely.
-    Creates a new database connection for each query.
+    Creates a new database connection for each query with timeout.
     """
     if params is None:
         params = {}
     
     try:
-        # Create a new driver connection for each query
+        # Create a new driver connection for each query with timeout
         with GraphDatabase.driver(
             os.getenv("NEO4J_URI", "bolt://localhost:7687"),
             auth=(
                 os.getenv("NEO4J_USERNAME", "neo4j"), 
                 os.getenv("NEO4J_PASSWORD", "password")
             ),
-            database=os.getenv("NEO4J_DATABASE", "neo4j")
+            database=os.getenv("NEO4J_DATABASE", "neo4j"),
+            connection_timeout=10,  # 10 second timeout
+            max_connection_lifetime=30  # 30 second max connection lifetime
         ) as driver:
             with driver.session() as session:
                 result = session.run(query, params)
@@ -62,7 +64,7 @@ def _execute_query(query: str, params: dict = None) -> str:
                 return json.dumps(serializable_records, indent=2)
     except Exception as e:
         logger.error(f"Neo4j query failed: {e}")
-        return json.dumps({"error": str(e)})
+        return json.dumps({"error": f"Database connection failed: {str(e)}. Please check your Neo4j connection settings."})
 
 def _validate_query_safety(cypher_query: str) -> bool:
     """
@@ -228,6 +230,16 @@ def get_neo4j_schema() -> str:
         cached_schema["_cached"] = True
         return json.dumps(cached_schema, indent=2)
     
+    # Test connection first with simple query
+    connection_test = _execute_query("RETURN 1 as test")
+    test_result = json.loads(connection_test)
+    if "error" in test_result:
+        return json.dumps({
+            "error": "Cannot connect to Neo4j database",
+            "details": test_result["error"],
+            "suggestion": "Please check your Neo4j connection settings and ensure the database is running."
+        })
+    
     # Get all node labels
     labels_query = "CALL db.labels() YIELD label RETURN collect(label) as labels"
     
@@ -237,6 +249,13 @@ def get_neo4j_schema() -> str:
     labels_result = json.loads(_execute_query(labels_query))
     rels_result = json.loads(_execute_query(rels_query))
     
+    # Check for errors in results
+    if "error" in labels_result:
+        return json.dumps({
+            "error": "Failed to retrieve database schema",
+            "details": labels_result["error"]
+        })
+    
     # Get sample nodes for each label to understand properties
     schema_info = {
         "labels": labels_result[0]["labels"] if labels_result else [],
@@ -244,11 +263,11 @@ def get_neo4j_schema() -> str:
         "node_properties": {}
     }
     
-    # For each label, get sample properties
+    # For each label, get sample properties (with error handling)
     for label in schema_info["labels"]:
         sample_query = f"MATCH (n:{label}) RETURN n LIMIT 1"
         sample_result = json.loads(_execute_query(sample_query))
-        if sample_result:
+        if sample_result and "error" not in sample_result and sample_result:
             schema_info["node_properties"][label] = list(sample_result[0]["n"].keys())
     
     # Save schema to cache for future use

@@ -123,3 +123,6 @@ root_agent = create_agent(enable_code_executor=True)
 
 # Create deployable agent (without code executor)
 deployable_agent = create_agent(enable_code_executor=False)
+
+# For ADK CLI compatibility
+agent = deployable_agent

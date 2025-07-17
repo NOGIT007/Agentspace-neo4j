@@ -159,3 +159,19 @@ certificates/
 # Cloud storage
 *.tar
 *.gz
+
+# Evaluation results (temporary files)
+baseline_results_*.json
+baseline_results_*.summary.md
+evaluation_reports/
+*_baseline.json
+temp_test.json
+
+# But track the main baseline file
+!eval/baseline_results.json
+!eval/baseline_results.summary.md
+
+# Build artifacts
+*.egg-info/
+build/
+dist/
