@@ -1,0 +1,40 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:google.github.io)",
+      "Bash(source:*)",
+      "Bash(python test:*)",
+      "Bash(adk web:*)",
+      "Bash(python:*)",
+      "Bash(curl:*)",
+      "Bash(pkill:*)",
+      "Bash(find:*)",
+      "Bash(true)",
+      "WebFetch(domain:cloud.google.com)",
+      "Bash(rm:*)",
+      "Bash(gcloud logging read:*)",
+      "Bash(gcloud ai reasoning-engines describe:*)",
+      "Bash(uv pip:*)",
+      "Bash(mkdir:*)",
+      "Bash(uv run:*)",
+      "Bash(git add:*)",
+      "Bash(git push:*)",
+      "Bash(./install.sh)",
+      "Bash(cat:*)",
+      "Bash(uv sync:*)",
+      "Bash(./start.sh:*)",
+      "Bash(ls:*)",
+      "Bash(cp:*)",
+      "Bash(git clone:*)"
+    ]
+  },
+  "enabledMcpjsonServers": [
+    "filesystem",
+    "github",
+    "neo4j-aura",
+    "puppeteer",
+    "Context7"
+  ]
+}

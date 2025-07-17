@@ -1,106 +1,66 @@
 [project]
 name = "neo4j-database-agent"
 version = "1.0.0"
-description = "Neo4j Database Agent with Google ADK - Natural Language to Cypher conversion"
+description = "Neo4j Database Agent with interactive visualizations"
 authors = [
-    {name = "Your Name", email = "your.email@example.com"}
+    {name = "Agent Neo4j", email = "noreply@example.com"}
 ]
+license = {text = "Apache-2.0"}
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    # Core ADK and Google Cloud dependencies
     "google-adk>=1.5.0",
     "google-cloud-aiplatform[adk,agent-engines]>=1.93.0",
-    "pydantic>=2.11.3",
-    
-    # Neo4j driver
     "neo4j>=5.0.0",
-    
-    # Configuration and utilities
     "python-dotenv>=1.0.0",
-    "absl-py>=2.2.2",
-    
-    # Web UI (for deployment management)
-    "flask>=2.3.0"
+    "pydantic>=2.11.0",
+    "pandas>=2.0.0",
+    "numpy>=1.24.0",
+    "plotly>=5.0.0",
+    "networkx>=3.0.0",
+    "scikit-learn>=1.0.0",
+    "matplotlib>=3.5.0",
+    "seaborn>=0.11.0",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=7.0.0",
-    "pytest-asyncio>=0.21.0",
-    "pytest-mock>=3.10.0",
-    "black>=23.0.0",
-    "flake8>=6.0.0",
-    "mypy>=1.0.0",
-    "pre-commit>=3.0.0",
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.26.0",
+    "black>=24.0.0",
+    "ruff>=0.1.0",
 ]
-
-docs = [
-    "sphinx>=6.0.0",
-    "sphinx-rtd-theme>=1.2.0",
-]
-
-deployment = [
-    "docker>=6.0.0",
-    "kubernetes>=26.0.0",
-    "google-cloud-notebooks>=1.7.0",
-    "google-cloud-pipeline-components>=1.0.0",
-]
-
-[project.scripts]
-neo4j-agent = "neo4j_database_agent.cli:main"
-deploy-agent = "deployment.deploy:main"
 
 [build-system]
 requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-where = ["."]
 include = ["neo4j_database_agent*"]
 
-[tool.black]
-line-length = 100
-target-version = ['py311']
-include = '\.pyi?$'
-extend-exclude = '''
-/(
-  # directories
-  \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | _build
-  | buck-out
-  | build
-  | dist
-)/
-'''
+[tool.setuptools.package-data]
+neo4j_database_agent = ["*.py"]
 
-[tool.mypy]
-python_version = "3.11"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
+[project.entry-points."google.adk.agents"]
+neo4j_database_agent = "neo4j_database_agent.agent_factory:deployable_agent"
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = ["test_*.py", "*_test.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
-asyncio_mode = "auto"
-
-[tool.coverage.run]
-source = ["neo4j_database_agent"]
-omit = ["*/tests/*", "*/test_*"]
-
-[tool.coverage.report]
-exclude_lines = [
-    "pragma: no cover",
-    "def __repr__",
-    "raise AssertionError",
-    "raise NotImplementedError",
-    "if __name__ == .__main__.:",
+console_output_style = "progress"
+addopts = "-vv -s"
+testpaths = ["tests/"]
+log_level = "DEBUG"
+log_cli = true
+log_auto_indent = true
+log_cli_date_format = "%Y-%m-%d %H:%M:%S"
+log_cli_format = "[%(asctime)s] %(levelname)s (%(funcName)s) \t [%(pathname)s:%(lineno)d] %(message)s"
+filterwarnings = [
+    "ignore::UserWarning",
 ]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.black]
+line-length = 88
+target-version = ['py311']

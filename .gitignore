@@ -64,6 +64,7 @@ tmp/
 credentials.json
 service-account-key.json
 *.json
+!.claude/**/*.json
 
 # Deployment files
 deployment_info.json

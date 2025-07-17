@@ -35,17 +35,13 @@ source .venv/bin/activate
 
 # Install dependencies
 echo "✓ Installing dependencies..."
-# Use the requirements.txt file instead of parsing pyproject.toml
-if [ -f requirements.txt ]; then
-    uv pip install -r requirements.txt
+# Use uv sync to install from pyproject.toml
+if [ -f pyproject.toml ]; then
+    uv sync
 else
-    echo "❌ Error: requirements.txt not found"
+    echo "❌ Error: pyproject.toml not found"
     exit 1
 fi
-
-# Install additional critical dependencies
-echo "✓ Installing additional dependencies..."
-uv pip install google-adk python-dotenv
 
 # Create .env from example if it doesn't exist
 if [ ! -f .env ]; then
@@ -63,15 +59,16 @@ fi
 # Verify installation
 echo ""
 echo "✓ Verifying installation..."
-python3 -c "from google.adk.agents import LlmAgent; print('  ✓ Google ADK installed')"
-python3 -c "import neo4j; print('  ✓ Neo4j driver installed')"
-python3 -c "from dotenv import load_dotenv; print('  ✓ python-dotenv installed')"
+uv run python -c "from google.adk.agents import Agent; print('  ✓ Google ADK installed')"
+uv run python -c "import neo4j; print('  ✓ Neo4j driver installed')"
+uv run python -c "from dotenv import load_dotenv; print('  ✓ python-dotenv installed')"
+uv run python -c "from neo4j_database_agent.agent import root_agent; print('  ✓ Neo4j agent imported successfully')"
 
 echo ""
 echo "✅ Installation complete!"
 echo ""
 echo "Next steps:"
 echo "1. Edit .env file with your credentials"
-echo "2. Run 'source .venv/bin/activate' to activate the environment"
-echo "3. Run 'adk web' to start the agent locally"
+echo "2. Run 'uv run python app.py' to start the deployment interface"
+echo "3. Or run 'adk web' to start the agent locally"
 echo ""

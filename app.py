@@ -348,7 +348,8 @@ def deploy_agent():
         # WARNING: Don't set GOOGLE_CLOUD_PROJECT, GOOGLE_CLOUD_LOCATION per documentation
         deployment_env_vars = {
             "MODEL_NAME": model_name,
-            "GOOGLE_GENAI_USE_VERTEXAI": "True"
+            "GOOGLE_GENAI_USE_VERTEXAI": "True",
+            "CODE_INTERPRETER_EXTENSION_NAME": os.getenv("CODE_INTERPRETER_EXTENSION_NAME", "")
         }
         
         # Add agent-specific environment variables
