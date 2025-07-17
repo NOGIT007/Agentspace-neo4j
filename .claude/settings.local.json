@@ -27,7 +27,9 @@
       "Bash(./start.sh:*)",
       "Bash(ls:*)",
       "Bash(cp:*)",
-      "Bash(git clone:*)"
+      "Bash(git clone:*)",
+      "Bash(git commit:*)",
+      "Bash(git rm:*)"
     ]
   },
   "enabledMcpjsonServers": [
